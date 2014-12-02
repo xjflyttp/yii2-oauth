@@ -2,6 +2,7 @@
 namespace xj\oauth;
 
 use yii\authclient\OAuth2;
+use yii\base\Exception;
 
 /**
  * Douban OAuth
