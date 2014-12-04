@@ -23,7 +23,7 @@ class QqAuth extends OAuth2 implements IAuth {
         }
     }
 
-    protected function initUserAttributes() {
+    public function initUserAttributes() {
         return $this->api('oauth2.0/me', 'GET');
     }
 
@@ -34,10 +34,12 @@ class QqAuth extends OAuth2 implements IAuth {
      */
     public function getUserInfo() {
         $openid = $this->getUserAttributes();
-        return $this->api("user/get_user_info", 'GET', [
-                    'oauth_consumer_key' => $openid['client_id'],
-                    'openid' => $openid['openid'
-        ]]);
+        $result = $this->api("user/get_user_info", 'GET', [
+            'oauth_consumer_key' => $openid['client_id'],
+            'openid' => $openid['openid'],
+        ]);
+        $result['openid'] = $openid['openid'];
+        return $result;
     }
 
     protected function defaultName() {
