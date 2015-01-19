@@ -28,7 +28,12 @@ components configure
                 'class' => 'xj\oauth\SinaAuth',
                 'clientId' => '111',
                 'clientSecret' => '111',
-            ]
+            ],
+            'weixin' => [
+                'class' => 'xj\oauth\WeixinAuth',
+                'clientId' => '111',
+                'clientSecret' => '111',
+            ],
         ]
     ]
     ...
@@ -57,7 +62,7 @@ class SiteController extends Controller
      * @see http://stuff.cebe.cc/yii2docs/yii-authclient-authaction.html
      */
     public function successCallback($client) {
-        $id = $client->getId(); // qq | sina
+        $id = $client->getId(); // qq | sina | weixin
         $attributes = $client->getUserAttributes(); // basic info
         $userInfo = $client->getUserInfo(); // user extend info
         var_dump($id, $attributes, $userInfo);
