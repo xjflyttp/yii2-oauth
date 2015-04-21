@@ -25,8 +25,8 @@ class WeixinAuth extends OAuth2 implements IAuth {
     public function buildAuthUrl(array $params = []) {
         $defaultParams = [
             'appid' => $this->clientId,
-            'response_type' => 'code',
             'redirect_uri' => $this->getReturnUrl(),
+            'response_type' => 'code',
         ];
         if (!empty($this->scope)) {
             $defaultParams['scope'] = $this->scope;
