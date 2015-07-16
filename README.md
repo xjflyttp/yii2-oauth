@@ -1,18 +1,19 @@
 yii2-oauth
-==========
+===
 
-OAUTH QQ|WEIBO
+QQ | Weibo | Douban | Renren | Weixin
+ - [QQExmail Docments](README.QQExmail.md)
 
 composer.json
------
+---
 ```json
 "require": {
-        "xj/yii2-oauth": "*"
+    "xj/yii2-oauth": "*"
 },
 ```
 
 components configure
-------
+---
 ```php
 'components' => [
     'authClientCollection' => [
@@ -41,7 +42,7 @@ components configure
 ```
 
 Controller
-----------
+---
 ```php
 class SiteController extends Controller
 {
@@ -71,7 +72,7 @@ class SiteController extends Controller
 ```
 
 View
------------
+---
 ```php
 <?=
 yii\authclient\widgets\AuthChoice::widget([
