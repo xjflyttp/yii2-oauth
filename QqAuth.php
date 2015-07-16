@@ -8,13 +8,15 @@ use yii\authclient\OAuth2;
  * QQ OAuth
  * @author xjflyttp <xjflyttp@gmail.com>
  */
-class QqAuth extends OAuth2 implements IAuth {
+class QqAuth extends OAuth2 implements IAuth
+{
 
     public $authUrl = 'https://graph.qq.com/oauth2.0/authorize';
     public $tokenUrl = 'https://graph.qq.com/oauth2.0/token';
     public $apiBaseUrl = 'https://graph.qq.com';
 
-    public function init() {
+    public function init()
+    {
         parent::init();
         if ($this->scope === null) {
             $this->scope = implode(',', [
@@ -23,7 +25,8 @@ class QqAuth extends OAuth2 implements IAuth {
         }
     }
 
-    protected function initUserAttributes() {
+    protected function initUserAttributes()
+    {
         return $this->api('oauth2.0/me', 'GET');
     }
 
@@ -32,7 +35,8 @@ class QqAuth extends OAuth2 implements IAuth {
      * @return []
      * @see http://wiki.connect.qq.com/get_user_info
      */
-    public function getUserInfo() {
+    public function getUserInfo()
+    {
         $openid = $this->getUserAttributes();
         return $this->api("user/get_user_info", 'GET', [
                     'oauth_consumer_key' => $openid['client_id'],
@@ -40,15 +44,18 @@ class QqAuth extends OAuth2 implements IAuth {
         ]]);
     }
 
-    protected function defaultName() {
+    protected function defaultName()
+    {
         return 'QQ';
     }
 
-    protected function defaultTitle() {
+    protected function defaultTitle()
+    {
         return 'QQ';
     }
 
-    protected function defaultViewOptions() {
+    protected function defaultViewOptions()
+    {
         return [
             'popupWidth' => 800,
             'popupHeight' => 500,
@@ -62,7 +69,8 @@ class QqAuth extends OAuth2 implements IAuth {
      * @throws Exception on failure.
      * @return array actual response.
      */
-    protected function processResponse($rawResponse, $contentType = self::CONTENT_TYPE_AUTO) {
+    protected function processResponse($rawResponse, $contentType = self::CONTENT_TYPE_AUTO)
+    {
         if ($contentType == self::CONTENT_TYPE_AUTO) {
             //jsonp to json
             if (strpos($rawResponse, "callback") === 0) {

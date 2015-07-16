@@ -9,7 +9,8 @@ use yii\base\Exception;
  * Douban OAuth
  * @author light <light-li@hotmail.com>
  */
-class DoubanAuth extends OAuth2 implements IAuth {
+class DoubanAuth extends OAuth2 implements IAuth
+{
 
     /**
      * @inheritdoc
@@ -31,25 +32,35 @@ class DoubanAuth extends OAuth2 implements IAuth {
      */
     public $scope = 'douban_basic_common';
 
+    protected function initUserAttributes()
+    {
+        //nothing
+        return $this->api('v2/user/~me', 'GET');
+    }
+
     /**
      * Get authed user info
      *
      * @return array
      * @see http://developers.douban.com/wiki/?title=user_v2#User
      */
-    public function getUserInfo() {
-        return $this->api('v2/user/~me', 'GET');
+    public function getUserInfo()
+    {
+        return $this->getUserAttributes();
     }
 
-    protected function defaultName() {
+    protected function defaultName()
+    {
         return 'douban';
     }
 
-    protected function defaultTitle() {
+    protected function defaultTitle()
+    {
         return 'Douban';
     }
 
-    protected function defaultViewOptions() {
+    protected function defaultViewOptions()
+    {
         return [
             'popupWidth' => 800,
             'popupHeight' => 500,
@@ -60,7 +71,8 @@ class DoubanAuth extends OAuth2 implements IAuth {
      *
      * @ineritdoc
      */
-    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = []) {
+    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = [])
+    {
         if (preg_match('/^https?:\\/\\//is', $apiSubUrl)) {
             $url = $apiSubUrl;
         } else {

@@ -9,7 +9,8 @@ use yii\authclient\OAuth2;
  * @author light <light-li@hotmail.com>
  * @see http://wiki.dev.renren.com/wiki/Authentication
  */
-class RenrenAuth extends OAuth2 implements IAuth {
+class RenrenAuth extends OAuth2 implements IAuth
+{
 
     /**
      * @inheritdoc
@@ -32,7 +33,8 @@ class RenrenAuth extends OAuth2 implements IAuth {
      *
      * @inheritdoc
      */
-    protected function initUserAttributes() {
+    protected function initUserAttributes()
+    {
         return $this->getAccessToken()->getParams()['user'];
     }
 
@@ -42,7 +44,8 @@ class RenrenAuth extends OAuth2 implements IAuth {
      * @see http://wiki.dev.renren.com/wiki/V2/user/get
      * @return array
      */
-    public function getUserInfo() {
+    public function getUserInfo()
+    {
         $user = $this->getUserAttributes();
         return $this->api("v2/user/get", 'GET', ['userId' => $user['id']]);
     }
@@ -50,21 +53,24 @@ class RenrenAuth extends OAuth2 implements IAuth {
     /**
      * @inheritdoc
      */
-    protected function defaultName() {
+    protected function defaultName()
+    {
         return 'renren';
     }
 
     /**
      * @inheritdoc
      */
-    protected function defaultTitle() {
+    protected function defaultTitle()
+    {
         return 'Renren';
     }
 
     /**
      * @inheritdoc
      */
-    protected function defaultViewOptions() {
+    protected function defaultViewOptions()
+    {
         return [
             'popupWidth' => 800,
             'popupHeight' => 500,
