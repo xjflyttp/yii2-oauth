@@ -16,7 +16,6 @@ class WeixinAuth extends OAuth2 implements IAuth
     public $tokenUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token';
     public $apiBaseUrl = 'https://api.weixin.qq.com';
     public $scope = 'snsapi_login';
-    public $openid = null;
 
     /**
      * Composes user authorization URL.
@@ -52,7 +51,6 @@ class WeixinAuth extends OAuth2 implements IAuth
             'grant_type' => 'authorization_code',
         ];
         $response = $this->sendRequest('POST', $this->tokenUrl, array_merge($defaultParams, $params));
-        $this->openid = isset($response['openid']) ? $response['openid'] : null;
         $token = $this->createToken(['params' => $response]);
         $this->setAccessToken($token);
 
@@ -65,12 +63,12 @@ class WeixinAuth extends OAuth2 implements IAuth
     protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
     {
         $params['access_token'] = $accessToken->getToken();
-        $params['openid'] = $this->openid;
+        $params['openid'] = $this->getOpenid();
         return $this->sendRequest($method, $url, $params, $headers);
     }
 
     /**
-     * 
+     *
      * @return []
      * @see https://open.weixin.qq.com/cgi-bin/showdocument?action=doc&id=open1419316518&t=0.14920092844688204
      */
@@ -89,6 +87,15 @@ class WeixinAuth extends OAuth2 implements IAuth
         return $this->getUserAttributes();
     }
 
+    /**
+     * @return string
+     */
+    public function getOpenid()
+    {
+        $attributes = $this->getUserAttributes();
+        return $attributes['openid'];
+    }
+
     protected function defaultName()
     {
         return 'Weixin';
@@ -98,13 +105,4 @@ class WeixinAuth extends OAuth2 implements IAuth
     {
         return 'Weixin';
     }
-
-    protected function defaultViewOptions()
-    {
-        return [
-            'popupWidth' => 800,
-            'popupHeight' => 500,
-        ];
-    }
-
 }

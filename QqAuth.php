@@ -31,7 +31,7 @@ class QqAuth extends OAuth2 implements IAuth
     }
 
     /**
-     * get UserInfo
+     *
      * @return []
      * @see http://wiki.connect.qq.com/get_user_info
      */
@@ -39,9 +39,18 @@ class QqAuth extends OAuth2 implements IAuth
     {
         $openid = $this->getUserAttributes();
         return $this->api("user/get_user_info", 'GET', [
-                    'oauth_consumer_key' => $openid['client_id'],
-                    'openid' => $openid['openid'
-        ]]);
+            'oauth_consumer_key' => $this->clientId,
+            'openid' => $this->getOpenid(),
+        ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpenid()
+    {
+        $attributes = $this->getUserAttributes();
+        return $attributes['openid'];
     }
 
     protected function defaultName()
@@ -52,14 +61,6 @@ class QqAuth extends OAuth2 implements IAuth
     protected function defaultTitle()
     {
         return 'QQ';
-    }
-
-    protected function defaultViewOptions()
-    {
-        return [
-            'popupWidth' => 800,
-            'popupHeight' => 500,
-        ];
     }
 
     /**

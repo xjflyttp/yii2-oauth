@@ -1,3 +1,4 @@
 /vendor/
 /debug/
 composer.lock
+/.idea

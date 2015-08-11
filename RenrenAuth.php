@@ -46,8 +46,16 @@ class RenrenAuth extends OAuth2 implements IAuth
      */
     public function getUserInfo()
     {
-        $user = $this->getUserAttributes();
-        return $this->api("v2/user/get", 'GET', ['userId' => $user['id']]);
+        return $this->api("v2/user/get", 'GET', ['userId' => $this->getOpenid()]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getOpenid()
+    {
+        $attributes = $this->getUserAttributes();
+        return $attributes['id'];
     }
 
     /**
@@ -64,17 +72,6 @@ class RenrenAuth extends OAuth2 implements IAuth
     protected function defaultTitle()
     {
         return 'Renren';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function defaultViewOptions()
-    {
-        return [
-            'popupWidth' => 800,
-            'popupHeight' => 500,
-        ];
     }
 
 }

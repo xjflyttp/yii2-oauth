@@ -3,14 +3,21 @@
 namespace xj\oauth;
 
 /**
- * Sina Weibo OAuth
+ * Oauth Interface
  * @author xjflyttp <xjflyttp@gmail.com>
  */
-interface IAuth {
+interface IAuth
+{
 
     /**
-     * get User Info
+     *
      * @return []
      */
     public function getUserInfo();
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getOpenid();
 }

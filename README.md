@@ -1,19 +1,18 @@
 yii2-oauth
-===
+==========
 
-QQ | Weibo | Douban | Renren | Weixin
- - [QQExmail Docments](README.QQExmail.md)
+OAUTH QQ|WEIBO
 
 composer.json
----
+-----
 ```json
 "require": {
-    "xj/yii2-oauth": "*"
+        "xj/yii2-oauth": "*"
 },
 ```
 
 components configure
----
+------
 ```php
 'components' => [
     'authClientCollection' => [
@@ -42,7 +41,7 @@ components configure
 ```
 
 Controller
----
+----------
 ```php
 class SiteController extends Controller
 {
@@ -65,14 +64,15 @@ class SiteController extends Controller
     public function successCallback($client) {
         $id = $client->getId(); // qq | sina | weixin
         $attributes = $client->getUserAttributes(); // basic info
+        $openid = $client->getOpenid(); //user openid
         $userInfo = $client->getUserInfo(); // user extend info
-        var_dump($id, $attributes, $userInfo);
+        var_dump($id, $attributes, $openid, $userInfo);
     }
 }
 ```
 
 View
----
+-----------
 ```php
 <?=
 yii\authclient\widgets\AuthChoice::widget([

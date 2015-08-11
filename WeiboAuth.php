@@ -16,7 +16,7 @@ class WeiboAuth extends OAuth2 implements IAuth
     public $apiBaseUrl = 'https://api.weibo.com';
 
     /**
-     * 
+     *
      * @return []
      * @see http://open.weibo.com/wiki/Oauth2/get_token_info
      * @see http://open.weibo.com/wiki/2/users/show
@@ -33,8 +33,16 @@ class WeiboAuth extends OAuth2 implements IAuth
      */
     public function getUserInfo()
     {
-        $openid = $this->getUserAttributes();
-        return $this->api("2/users/show.json", 'GET', ['uid' => $openid['uid']]);
+        return $this->api("2/users/show.json", 'GET', ['uid' => $this->getOpenid()]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getOpenid()
+    {
+        $attributes = $this->getUserAttributes();
+        return $attributes['uid'];
     }
 
     protected function defaultName()
@@ -45,14 +53,6 @@ class WeiboAuth extends OAuth2 implements IAuth
     protected function defaultTitle()
     {
         return 'Weibo';
-    }
-
-    protected function defaultViewOptions()
-    {
-        return [
-            'popupWidth' => 800,
-            'popupHeight' => 500,
-        ];
     }
 
 }
