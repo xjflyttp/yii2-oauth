@@ -83,5 +83,12 @@ class DoubanAuth extends OAuth2 implements IAuth
         $headers[] = 'Authorization: Bearer ' . $accessToken->getToken();
         return $this->apiInternal($accessToken, $url, $method, $params, $headers);
     }
+    
+    /** 
+     *
+     * @ineritdoc
+     */
+    protected function initUserAttributes() {
+    }
 
 }
