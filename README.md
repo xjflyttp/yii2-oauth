@@ -7,7 +7,7 @@ composer.json
 -----
 ```json
 "require": {
-        "xj/yii2-oauth": "*"
+        "xj/yii2-oauth": "~1.0"
 },
 ```
 
