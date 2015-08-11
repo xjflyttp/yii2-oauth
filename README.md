@@ -34,6 +34,16 @@ components configure
                 'clientId' => '111',
                 'clientSecret' => '111',
             ],
+            'renren' => [
+                'class' => 'xj\oauth\RenrenAuth',
+                'clientId' => '111',
+                'clientSecret' => '111',
+            ],
+            'douban' => [
+                'class' => 'xj\oauth\DoubanAuth',
+                'clientId' => '111',
+                'clientSecret' => '111',
+            ],
         ]
     ]
     ...
