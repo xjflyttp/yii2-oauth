@@ -1,4 +1,1 @@
-/vendor/
-/debug/
-composer.lock
-/.idea
+.idea
