@@ -3,6 +3,7 @@
 namespace xj\oauth;
 
 use yii\authclient\OAuth2;
+use yii\authclient\OAuthToken;
 
 /**
  * Weixin OAuth

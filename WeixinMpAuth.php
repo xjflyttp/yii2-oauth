@@ -2,14 +2,21 @@
 
 namespace xj\oauth;
 
+use Yii;
+use xj\oauth\weixin\models\MpTicketResult;
+use xj\oauth\weixin\models\MpAccessTokenResult;
+use xj\oauth\exception\WeixinAccessTokenException;
+use xj\oauth\exception\WeixinTicketException;
 use yii\authclient\OAuth2;
+use yii\authclient\OAuthToken;
+use yii\base\Exception;
 
 /**
  * Weixin 开放平台
  * @author xjflyttp <xjflyttp@gmail.com>
  * @see http://mp.weixin.qq.com/wiki/17/c0f37d5704f0b64713d5d2c37b468d75.html
  */
-class WechatMpAuth extends OAuth2 implements IAuth
+class WeixinMpAuth extends OAuth2 implements IAuth
 {
 
     public $authUrl = 'https://open.weixin.qq.com/connect/oauth2/authorize';
@@ -106,6 +113,46 @@ class WechatMpAuth extends OAuth2 implements IAuth
     protected function defaultTitle()
     {
         return 'WeixinMp';
+    }
+
+    /**
+     * 获取公众号AccessToken
+     * @return MpAccessTokenResult
+     * @throws WeixinAccessTokenException
+     */
+    public function getMpAccessToken()
+    {
+        try {
+            $result = $this->sendRequest('GET', $this->apiBaseUrl . '/cgi-bin/token', [
+                'grant_type' => 'client_credential',
+                'appid' => $this->clientId,
+                'secret' => $this->clientSecret,
+            ]);
+            return new MpAccessTokenResult($result);
+        } catch (Exception $e) {
+            throw new WeixinAccessTokenException($e->getMessage(), $e->getCode());
+        }
+
+    }
+
+    /**
+     * 获取jsapi|wx_card Ticket
+     * @param string $accessToken
+     * @param string $type jsapi|wx_card
+     * @return MpTicketResult
+     * @throws WeixinTicketException
+     */
+    public function getTicket($accessToken, $type = 'jsapi')
+    {
+        try {
+            $result = $this->sendRequest('GET', $this->apiBaseUrl . '/cgi-bin/ticket/getticket', [
+                'access_token' => $accessToken,
+                'type' => $type,
+            ]);
+            return new MpTicketResult($result);
+        } catch (Exception $e) {
+            throw new WeixinTicketException($e->getMessage(), $e->getCode());
+        }
     }
 
 }

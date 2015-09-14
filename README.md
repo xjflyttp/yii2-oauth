@@ -1,18 +1,18 @@
-yii2-oauth
-==========
+# yii2-oauth
+===
 
 OAUTH QQ|WEIBO
 
-composer.json
------
+### composer.json
+---
 ```json
 "require": {
         "xj/yii2-oauth": "*"
 },
 ```
 
-components configure
-------
+### components configure
+---
 ```php
 'components' => [
     'authClientCollection' => [
@@ -44,14 +44,19 @@ components configure
                 'clientId' => '111',
                 'clientSecret' => '111',
             ],
+            'weixin-mp' => [
+                'class' => 'xj\oauth\WeixinMpAuth',
+                'clientId' => '111',
+                'clientSecret' => '111',
+            ],
         ]
     ]
     ...
 ]
 ```
 
-Controller
-----------
+### Controller
+---
 ```php
 class SiteController extends Controller
 {
@@ -81,8 +86,8 @@ class SiteController extends Controller
 }
 ```
 
-View
------------
+### View
+---
 ```php
 <?=
 yii\authclient\widgets\AuthChoice::widget([
@@ -90,4 +95,34 @@ yii\authclient\widgets\AuthChoice::widget([
     'popupMode' => false,
 ])
 ?>
+```
+
+
+### WeixinMp
+```php
+$weixinMp = Yii::$app->authClientCollection->getClient('weixin-mp');
+
+// http://mp.weixin.qq.com/wiki/11/0e4b294685f817b95cbed85ba5e82b8f.html
+// getAccessToken
+$accessTokenResult = $weixinMp->getMpAccessToken();
+if ($accessTokenResult->validate()) {
+    $accessTokenResult->access_token;
+    $accessTokenResult->expires_in;
+    $accessTokenResult->getAccessToken(); // WeixinMpToken
+} else {
+    var_dump($accessTokenResult->getErrCodeText());
+    var_dump($accessTokenResult->getErrors());
+}
+
+// http://mp.weixin.qq.com/wiki/7/aaa137b55fb2e0456bf8dd9148dd613f.html#.E8.8E.B7.E5.8F.96api_ticket
+// getTicket
+$accessTokenResult = $weixinMp->getMpAccessToken();
+$ticketType = 'jsapi'; // wx_card
+$ticketResult = $weixinMp->getTicket($accessTokenResult->access_token, $ticketType);
+if ($ticketResult->validate()) {
+    $accessTokenResult->ticket; // TicketString
+} else {
+    var_dump($ticketResult->getErrCodeText());
+    var_dump($ticketResult->getErrors());
+}
 ```
