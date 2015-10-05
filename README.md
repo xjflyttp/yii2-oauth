@@ -24,8 +24,8 @@ OAUTH QQ|WEIBO
                 'clientSecret' => '111',
 
             ],
-            'sina' => [
-                'class' => 'xj\oauth\SinaAuth',
+            'weibo' => [
+                'class' => 'xj\oauth\WeiboAuth',
                 'clientId' => '111',
                 'clientSecret' => '111',
             ],
