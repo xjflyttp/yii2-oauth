@@ -83,7 +83,7 @@ class QqExmailAuth extends OAuth2
     public function getAccessToken()
     {
         $accessToken = parent::getAccessToken();
-        if (null === $accessToken) {
+        if (null === $accessToken || !$accessToken->getIsValid()) {
             $accessToken = $this->fetchAccessToken();
         }
         if (null === $accessToken) {
@@ -93,24 +93,24 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $email MemberEmail
      * @return string Member Auth Key
-     * @throws 
+     * @throws QqExmailException
      */
     public function getMemberAuthKey($email)
     {
         $result = $this->api('openapi/mail/authkey', 'GET', ['alias' => $email]);
 
-        if (false === isset($result['auth_key'])) {
-            throw new QqExmailException('get Auth Key Fail');
+        if (isset($result['errcode']) || isset($result['error'])) {
+            throw new QqExmailException($result['error'], $result['errcode']);
         }
 
         return $result['auth_key'];
     }
 
     /**
-     * 
+     *
      * @param string $email login EMAIL
      * @param string $ticket getAuthKey()
      * @return string Login Web Url
@@ -125,14 +125,14 @@ class QqExmailAuth extends OAuth2
         }
         $requestUrl = str_replace([
             '<agent>', '<email>', '<ticket>'
-                ], [
+        ], [
             $agent, $email, $ticket
-                ], $urlTemplate);
+        ], $urlTemplate);
         return $requestUrl;
     }
 
     /**
-     * 
+     *
      * @param string $email MemberEmail
      * @return string MemberInfo
      * @throws QqExmailException
@@ -164,7 +164,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $email
      * @return boolean
      */
@@ -194,7 +194,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $partyPath
      * @return []
      * @throws QqExmailException
@@ -212,7 +212,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $partyPath
      * @return []
      * @throws QqExmailException
@@ -230,7 +230,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $email
      * @return bool
      * @throws QqExmailException
@@ -248,7 +248,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $email
      * @return bool
      */
@@ -259,7 +259,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param int $ver 0=all
      * @return []
      * @throws QqExmailException
@@ -277,7 +277,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $email
      * @return int
      * @throws QqExmailException
@@ -295,7 +295,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $groupName 组名
      * @param string $groupAdmin 组管理员(需要使用一个域中不存在的邮箱地址)
      * @param string $status 组状态
@@ -319,7 +319,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $groupAlias AdminEmail
      * @return boolean
      * @throws QqExmailException
@@ -337,7 +337,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param string $groupAlias AdminEmail
      * @param string $members MemberEmail
      * @return boolean
@@ -353,12 +353,11 @@ class QqExmailAuth extends OAuth2
         if (isset($result['errcode']) || isset($result['error'])) {
             throw new QqExmailException($result['error'], $result['errcode']);
         }
-        var_dump($result);
         return true;
     }
 
     /**
-     * 
+     *
      * @param string $groupAlias
      * @param string $members
      * @return boolean
@@ -379,7 +378,7 @@ class QqExmailAuth extends OAuth2
     }
 
     /**
-     * 
+     *
      * @param int $ver
      * @return []
      * @throws QqExmailException
