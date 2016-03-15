@@ -80,8 +80,7 @@ class WeixinAuth extends OAuth2 implements IAuth
 
     /**
      * get UserInfo
-     * @return []
-     * @see http://open.weibo.com/wiki/2/users/show
+     * @return array
      */
     public function getUserInfo()
     {
@@ -93,8 +92,7 @@ class WeixinAuth extends OAuth2 implements IAuth
      */
     public function getOpenid()
     {
-        $attributes = $this->getUserAttributes();
-        return $attributes['openid'];
+        return $this->getAccessToken()->getParam('openid');
     }
 
     protected function defaultName()
