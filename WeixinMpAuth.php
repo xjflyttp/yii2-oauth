@@ -2,6 +2,8 @@
 
 namespace xj\oauth;
 
+use xj\oauth\exception\WeixinException;
+use xj\oauth\weixin\models\MpUserInfoResult;
 use Yii;
 use xj\oauth\weixin\models\MpTicketResult;
 use xj\oauth\weixin\models\MpAccessTokenResult;
@@ -155,5 +157,25 @@ class WeixinMpAuth extends OAuth2 implements IAuth
         }
     }
 
+    /**
+     * @param $openid
+     * @param string $lang
+     * @return MpUserInfoResult
+     * @throws Exception
+     * @see http://mp.weixin.qq.com/wiki/14/bb5031008f1494a59c6f71fa0f319c66.html
+     */
+    public function getUserInfoByOpenid($openid, $lang = 'zh_CN')
+    {
+        try {
+            $params = [
+                'openid' => $openid,
+                'lang' => $lang,
+            ];
+            $result = $this->api('cgi-bin/user/info', 'GET', $params);
+            return new MpUserInfoResult($result);
+        } catch (Exception $e) {
+            throw new WeixinException($e->getMessage(), $e->getCode());
+        }
+    }
 }
 
