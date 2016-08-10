@@ -2,7 +2,10 @@
 
 namespace xj\oauth;
 
+use yii\authclient\InvalidResponseException;
 use yii\authclient\OAuth2;
+use yii\httpclient\Request;
+use yii\httpclient\Response;
 
 /**
  * QQ OAuth
@@ -37,7 +40,6 @@ class QqAuth extends OAuth2 implements IAuth
      */
     public function getUserInfo()
     {
-        $openid = $this->getUserAttributes();
         return $this->api("user/get_user_info", 'GET', [
             'oauth_consumer_key' => $this->clientId,
             'openid' => $this->getOpenid(),
@@ -64,25 +66,39 @@ class QqAuth extends OAuth2 implements IAuth
     }
 
     /**
-     * Processes raw response converting it to actual data.
-     * @param string $rawResponse raw response.
-     * @param string $contentType response content type.
-     * @throws Exception on failure.
-     * @return array actual response.
+     * Sends the given HTTP request, returning response data.
+     * @param \yii\httpclient\Request $request HTTP request to be sent.
+     * @return array response data.
+     * @throws InvalidResponseException on invalid remote response.
+     * @since 2.1
      */
-    protected function processResponse($rawResponse, $contentType = self::CONTENT_TYPE_AUTO)
+    protected function sendRequest($request)
     {
-        if ($contentType == self::CONTENT_TYPE_AUTO) {
-            //jsonp to json
-            if (strpos($rawResponse, "callback") === 0) {
-                $lpos = strpos($rawResponse, "(");
-                $rpos = strrpos($rawResponse, ")");
-                $rawResponse = substr($rawResponse, $lpos + 1, $rpos - $lpos - 1);
-                $rawResponse = trim($rawResponse);
-                $contentType = self::CONTENT_TYPE_JSON;
-            }
+        $response = $request->send();
+
+        if (!$response->getIsOk()) {
+            throw new InvalidResponseException($response, 'Request failed with code: ' . $response->getStatusCode() . ', message: ' . $response->getContent());
         }
-        return parent::processResponse($rawResponse, $contentType);
+
+        $this->processResult($response);
+
+        return $response->getData();
+    }
+
+    /**
+     * @param Response $response
+     */
+    protected function processResult(Response $response)
+    {
+        $content = $response->getContent();
+        if (strpos($content, "callback") !== 0) {
+            return;
+        }
+        $lpos = strpos($content, "(");
+        $rpos = strrpos($content, ")");
+        $content = substr($content, $lpos + 1, $rpos - $lpos - 1);
+        $content = trim($content);
+        $response->setContent($content);
     }
 
 }

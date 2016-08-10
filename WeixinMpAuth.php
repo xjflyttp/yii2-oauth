@@ -12,6 +12,7 @@ use xj\oauth\exception\WeixinTicketException;
 use yii\authclient\OAuth2;
 use yii\authclient\OAuthToken;
 use yii\base\Exception;
+use yii\web\HttpException;
 
 /**
  * Weixin 开放平台
@@ -35,11 +36,17 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     {
         $defaultParams = [
             'appid' => $this->clientId,
-            'redirect_uri' => $this->getReturnUrl(),
             'response_type' => 'code',
+            'redirect_uri' => $this->getReturnUrl(),
         ];
         if (!empty($this->scope)) {
             $defaultParams['scope'] = $this->scope;
+        }
+
+        if ($this->validateAuthState) {
+            $authState = $this->generateAuthState();
+            $this->setState('authState', $authState);
+            $defaultParams['state'] = $authState;
         }
 
         return $this->composeUrl($this->authUrl, array_merge($defaultParams, $params));
@@ -50,29 +57,56 @@ class WeixinMpAuth extends OAuth2 implements IAuth
      * @param string $authCode authorization code, usually comes at $_GET['code'].
      * @param array $params additional request params.
      * @return OAuthToken access token.
+     * @throws HttpException on invalid auth state in case [[enableStateValidation]] is enabled.
      */
     public function fetchAccessToken($authCode, array $params = [])
     {
+        if ($this->validateAuthState) {
+            $authState = $this->getState('authState');
+            if (!isset($_REQUEST['state']) || empty($authState) || strcmp($_REQUEST['state'], $authState) !== 0) {
+                throw new HttpException(400, 'Invalid auth state parameter.');
+            } else {
+                $this->removeState('authState');
+            }
+        }
+
         $defaultParams = [
             'appid' => $this->clientId,
             'secret' => $this->clientSecret,
             'code' => $authCode,
             'grant_type' => 'authorization_code',
+            'redirect_uri' => $this->getReturnUrl(),
         ];
-        $response = $this->sendRequest('POST', $this->tokenUrl, array_merge($defaultParams, $params));
+
+        $request = $this->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->tokenUrl)
+            ->setData(array_merge($defaultParams, $params));
+
+        $response = $this->sendRequest($request);
+
         $token = $this->createToken(['params' => $response]);
         $this->setAccessToken($token);
+
         return $token;
     }
 
+
     /**
-     * @inheritdoc
+     * Handles [[Request::EVENT_BEFORE_SEND]] event.
+     * Applies [[accessToken]] to the request.
+     * @param \yii\httpclient\RequestEvent $event event instance.
+     * @throws Exception on invalid access token.
+     * @since 2.1
      */
-    protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
+    public function beforeApiRequestSend($event)
     {
-        $params['access_token'] = $accessToken->getToken();
-        $params['openid'] = $this->getOpenid();
-        return $this->sendRequest($method, $url, $params, $headers);
+        $request = $event->request;
+        $data = $request->getData();
+        $data['openid'] = $this->getOpenid();
+        $request->setData($data);
+
+        parent::beforeApiRequestSend($event);
     }
 
     /**
@@ -125,7 +159,7 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     public function getMpAccessToken()
     {
         try {
-            $result = $this->sendRequest('GET', $this->apiBaseUrl . '/cgi-bin/token', [
+            $result = $this->api($this->apiBaseUrl . '/cgi-bin/token', 'GET', [
                 'grant_type' => 'client_credential',
                 'appid' => $this->clientId,
                 'secret' => $this->clientSecret,
@@ -147,9 +181,9 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     public function getTicket($accessToken, $type = 'jsapi')
     {
         try {
-            $result = $this->sendRequest('GET', $this->apiBaseUrl . '/cgi-bin/ticket/getticket', [
-                'access_token' => $accessToken,
+            $result = $this->api($this->apiBaseUrl . '/cgi-bin/ticket/getticket', 'GET', [
                 'type' => $type,
+                'access_token' => $accessToken,
             ]);
             return new MpTicketResult($result);
         } catch (Exception $e) {
