@@ -1,17 +1,15 @@
 # yii2-oauth
 ===
 
-OAUTH QQ|WEIBO
-
 ### composer.json
 ---
 ```json
 "require": {
-        "xj/yii2-oauth": "~1.0"
+        "xj/yii2-oauth": "~2.0.0"
 },
 ```
 
-### components configure
+### config
 ---
 ```php
 'components' => [
@@ -48,6 +46,11 @@ OAUTH QQ|WEIBO
                 'class' => 'xj\oauth\WeixinMpAuth',
                 'clientId' => '111',
                 'clientSecret' => '111',
+            ],
+            'amazon' => [
+                'class' => 'xj\oauth\AmazonAuth',
+                'clientId' => '',
+                'clientSecret' => '',
             ],
         ]
     ]
