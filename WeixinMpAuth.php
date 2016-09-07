@@ -103,7 +103,7 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     {
         $request = $event->request;
         $data = $request->getData();
-        $data['openid'] = $this->getOpenid();
+//        $data['openid'] = $this->getOpenid();
         $request->setData($data);
 
         parent::beforeApiRequestSend($event);
@@ -129,7 +129,9 @@ class WeixinMpAuth extends OAuth2 implements IAuth
      */
     public function getUserInfo()
     {
-        return $this->api('sns/userinfo', 'GET', ['openid' => $this->getOpenid()]);
+        return $this->api('sns/userinfo', 'GET', [
+            'openid' => $this->getOpenid()
+        ]);
     }
 
     /**
@@ -163,6 +165,8 @@ class WeixinMpAuth extends OAuth2 implements IAuth
                 'grant_type' => 'client_credential',
                 'appid' => $this->clientId,
                 'secret' => $this->clientSecret,
+                'openid' => $this->getOpenid(),
+
             ]);
             return new MpAccessTokenResult($result);
         } catch (Exception $e) {
@@ -201,15 +205,26 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     public function getUserInfoByOpenid($openid, $lang = 'zh_CN')
     {
         try {
-            $params = [
+            $result = $this->api('cgi-bin/user/info', 'GET', [
                 'openid' => $openid,
                 'lang' => $lang,
-            ];
-            $result = $this->api('cgi-bin/user/info', 'GET', $params);
+            ]);
             return new MpUserInfoResult($result);
         } catch (Exception $e) {
             throw new WeixinException($e->getMessage(), $e->getCode());
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applyAccessTokenToRequest($request, $accessToken)
+    {
+        $data = $request->getData();
+        if (false === isset($data['access_token'])) {
+            $data['access_token'] = $accessToken->getToken();
+        }
+        $request->setData($data);
     }
 }
 
