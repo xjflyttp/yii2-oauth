@@ -165,8 +165,6 @@ class WeixinMpAuth extends OAuth2 implements IAuth
                 'grant_type' => 'client_credential',
                 'appid' => $this->clientId,
                 'secret' => $this->clientSecret,
-                'openid' => $this->getOpenid(),
-
             ]);
             return new MpAccessTokenResult($result);
         } catch (Exception $e) {
