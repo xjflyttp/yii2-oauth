@@ -161,7 +161,7 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     public function getMpAccessToken()
     {
         try {
-            $result = $this->api($this->apiBaseUrl . '/cgi-bin/token', 'GET', [
+            $result = $this->apiWithoutAccessToken($this->apiBaseUrl . '/cgi-bin/token', 'GET', [
                 'grant_type' => 'client_credential',
                 'appid' => $this->clientId,
                 'secret' => $this->clientSecret,
@@ -183,7 +183,7 @@ class WeixinMpAuth extends OAuth2 implements IAuth
     public function getTicket($accessToken, $type = 'jsapi')
     {
         try {
-            $result = $this->api($this->apiBaseUrl . '/cgi-bin/ticket/getticket', 'GET', [
+            $result = $this->apiWithoutAccessToken($this->apiBaseUrl . '/cgi-bin/ticket/getticket', 'GET', [
                 'type' => $type,
                 'access_token' => $accessToken,
             ]);
@@ -223,6 +223,34 @@ class WeixinMpAuth extends OAuth2 implements IAuth
             $data['access_token'] = $accessToken->getToken();
         }
         $request->setData($data);
+    }
+
+    /**
+     * Performs request to the OAuth API returning response data.
+     * You may use [[createRequest()]] method instead, gaining more control over request execution.
+     * @see createApiRequest()
+     * @param string $apiSubUrl API sub URL, which will be append to [[apiBaseUrl]], or absolute API URL.
+     * @param string $method request method.
+     * @param array|string $data request data or content.
+     * @param array $headers additional request headers.
+     * @return array API response data.
+     */
+    public function apiWithoutAccessToken($apiSubUrl, $method = 'GET', $data = [], $headers = [])
+    {
+        $request = $this->createRequest()
+            ->setMethod($method)
+            ->setUrl($apiSubUrl)
+            ->addHeaders($headers);
+
+        if (!empty($data)) {
+            if (is_array($data)) {
+                $request->setData($data);
+            } else {
+                $request->setContent($data);
+            }
+        }
+
+        return $this->sendRequest($request);
     }
 }
 
