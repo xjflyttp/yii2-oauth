@@ -46,6 +46,11 @@ class QqAuth extends OAuth2 implements IAuth
         ]);
     }
 
+     public function getUnionId(){
+        $info = $this->api('oauth2.0/me', 'GET',['unionid'=>1]);
+        return isset($info['unionid'])?$info['unionid']:'';
+    }
+    
     /**
      * @return string
      */
